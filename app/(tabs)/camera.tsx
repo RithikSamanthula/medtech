@@ -86,7 +86,7 @@ export default function CameraScreen() {
     
     try {
       const analysis = await analyzeImage(imageBase64);
-      setResult(analysis);
+      setImageResult(analysis);
     } catch (error) {
       console.error('Analysis error:', error);
       Alert.alert('Error', error instanceof Error ? error.message : 'Failed to analyze image. Please try again.');
