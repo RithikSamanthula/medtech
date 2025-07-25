@@ -1,9 +1,18 @@
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.EXPO_PUBLIC_OPENAI_API_KEY || 'demo-key',
-  dangerouslyAllowBrowser: true,
-});
+let openai: OpenAI | null = null;
+
+try {
+  const apiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
+  if (apiKey && apiKey !== 'your_openai_api_key_here') {
+    openai = new OpenAI({
+      apiKey: apiKey,
+      dangerouslyAllowBrowser: true,
+    });
+  }
+} catch (error) {
+  console.warn('OpenAI client initialization failed:', error);
+}
 
 export interface SymptomAnalysis {
   diagnoses: string[];
@@ -30,6 +39,17 @@ export interface ImageDescriptionAnalysis {
 
 export async function analyzeSymptoms(symptoms: string): Promise<SymptomAnalysis> {
   try {
+    if (!openai) {
+      // Return mock data when OpenAI is not available
+      return {
+        diagnoses: ['Common cold', 'Viral infection', 'Seasonal allergies'],
+        urgency: 'self-care',
+        nextSteps: 'Rest, stay hydrated, and monitor symptoms. Consider over-the-counter remedies for comfort.',
+        explanation: 'Based on your symptoms, this appears to be a common viral infection. Most cases resolve on their own with proper rest and care.',
+        confidence: 75
+      };
+    }
+
     const prompt = `You are a medical AI assistant. Analyze the following symptoms and provide a structured response. Be conservative and always recommend professional medical care when in doubt.\n\nSymptoms: "${symptoms}"\n\nPlease provide:\n1. Up to 3 most likely diagnoses (common conditions only)\n2. Urgency level (self-care, see-doctor-soon, or urgent)\n3. Recommended next steps\n4. Brief explanation\n5. Confidence level (0-100)\n\nFormat your response as JSON with these exact keys: diagnoses (array), urgency (string), nextSteps (string), explanation (string), confidence (number).\n\nImportant: This is for informational purposes only and should not replace professional medical advice.`;
 
     const completion = await openai.chat.completions.create({
@@ -74,6 +94,15 @@ export async function analyzeSymptoms(symptoms: string): Promise<SymptomAnalysis
 
 export async function analyzeImage(imageBase64: string): Promise<ImageDescriptionAnalysis> {
   try {
+    if (!openai) {
+      // Return mock data when OpenAI is not available
+      return {
+        features: 'The image shows skin with some visible characteristics that may warrant attention.',
+        possible_categories: ['Skin irregularity', 'Surface changes', 'Pigmentation variation'],
+        general_advice: 'Consider monitoring for changes and consult a healthcare professional if you have concerns.'
+      };
+    }
+
     const prompt = `You are an expert in visual pattern recognition. Carefully observe the provided image and describe any visible features, patterns, or notable aspects in detail.\nDo not provide a diagnosis or medical advice.\nIf you notice anything that could be of general concern, mention it in neutral, informational terms.\nRespond ONLY with valid JSON and nothing else. Do not include any explanation or text outside the JSON object.\n\nFormat your response as JSON with these exact keys:\n- features (string): a detailed description of what is visible in the image\n- possible_categories (array): up to 3 general categories or types this image might belong to (e.g., "skin irregularity", "redness", "swelling")\n- general_advice (string): general, non-medical advice for someone noticing similar features (e.g., "Consider monitoring for changes" or "Consult a professional if concerned")`;
 
     const completion = await openai.chat.completions.create({

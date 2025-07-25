@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { Link } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Mic, Camera, Stethoscope, Zap, Shield, Clock } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
@@ -9,17 +8,13 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-      <LinearGradient
-        colors={['#1e293b', '#334155', '#475569']}
-        style={styles.header}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}>
+      <View style={styles.header}>
         <View style={styles.headerContent}>
           <Stethoscope size={32} color="#ffffff" />
           <Text style={styles.headerTitle}>Symptom Snap</Text>
           <Text style={styles.headerSubtitle}>AI Health Triage in Seconds</Text>
         </View>
-      </LinearGradient>
+      </View>
 
       <View style={styles.content}>
         <Text style={styles.sectionTitle}>Quick Health Assessment</Text>
@@ -30,33 +25,25 @@ export default function HomeScreen() {
         <View style={styles.actionGrid}>
           <Link href="/voice" asChild>
             <TouchableOpacity style={[styles.actionCard, styles.voiceCard]}>
-              <LinearGradient
-                colors={['#1e40af', '#3730a3', '#581c87']}
-                style={styles.cardGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}>
+              <View style={[styles.cardGradient, styles.voiceGradient]}>
                 <Mic size={40} color="#ffffff" />
                 <Text style={styles.cardTitle}>Describe Symptoms</Text>
                 <Text style={styles.cardDescription}>
                   Speak naturally about what you're experiencing
                 </Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           </Link>
 
           <Link href="/camera" asChild>
             <TouchableOpacity style={[styles.actionCard, styles.cameraCard]}>
-              <LinearGradient
-                colors={['#581c87', '#6b21a8', '#1e40af']}
-                style={styles.cardGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}>
+              <View style={[styles.cardGradient, styles.cameraGradient]}>
                 <Camera size={40} color="#ffffff" />
                 <Text style={styles.cardTitle}>Scan Skin Issue</Text>
                 <Text style={styles.cardDescription}>
                   Take a photo of rashes, bumps, or skin concerns
                 </Text>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           </Link>
         </View>
@@ -129,6 +116,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 40,
     paddingHorizontal: 20,
+    backgroundColor: '#334155',
   },
   headerContent: {
     alignItems: 'center',
@@ -187,6 +175,12 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  voiceGradient: {
+    backgroundColor: '#1e40af',
+  },
+  cameraGradient: {
+    backgroundColor: '#581c87',
   },
   cardTitle: {
     fontSize: 18,
